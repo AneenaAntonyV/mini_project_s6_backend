@@ -41,7 +41,25 @@ app.get("/categories",(req,res)=> {
     });
 })
 
-app.get("/emergency_list",(req,res)=> {
+app.get("/emergency_list", (req, res) => {
+    const id = req.query.id; // Extract ID from query parameter
+
+    if (!id) {
+        return res.status(400).json({ error: 'ID parameter is required' });
+    }
+
+    const query = `SELECT * FROM emergency_list WHERE id = ?`;
+    connection.query(query, [id], (err, results) => {
+        if (err) {
+            console.error('Error fetching data:', err);
+            return res.status(500).json({ error: 'Internal server error' });
+        }
+        console.log('Data fetched:', results);
+        res.json(results);
+    });
+});
+
+/*app.get("/emergency_list",(req,res)=> {
     const query = 'SELECT * FROM emergency_list where id=4';
 
     connection.query(query, (err, results) => {
@@ -53,3 +71,16 @@ app.get("/emergency_list",(req,res)=> {
         }
     });
 })
+
+app.get("/emergency_list",(req,res)=> {
+    const query = 'SELECT * FROM emergency_list where id=5';
+
+    connection.query(query, (err, results) => {
+        if (err) throw err;
+        else {
+            console.log('emergency_List:', results);
+            console.log('Data fetched:', results);
+            res.json(results);
+        }
+    });
+})*/
