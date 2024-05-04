@@ -9,12 +9,42 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors())
 
-const connection=mysql.createConnection({
-    host:"localhost",
-    user:'root',
-    password:'',
-    database:'emergencyaiddb'
-})
+// const connection=mysql.createConnection({
+//     host:"localhost",
+//     user:'root',
+//     password:'',
+//     database:'emergencyaiddb'
+// })
+const db_config = {
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'emergencyaiddb'
+};
+
+var connection;
+
+function handleDisconnect() {
+  connection = mysql.createConnection(db_config);
+
+  connection.connect(function(err) {
+    if (err) {
+      console.log('Error when connecting to db:', err);
+      setTimeout(handleDisconnect, 2000);
+    }
+  });
+
+  connection.on('error', function(err) {
+    console.log('DB error', err);
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+      handleDisconnect();
+    } else {
+      throw err;
+    }
+  });
+}
+
+handleDisconnect();
 
 
 app.get('/',(re,res)=> {
